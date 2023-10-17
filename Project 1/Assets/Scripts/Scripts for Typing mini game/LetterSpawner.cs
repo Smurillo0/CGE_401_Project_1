@@ -15,22 +15,33 @@ public class LetterSpawner : MonoBehaviour
     private Vector3 spawnPos;
     private GameObject letter;
     private GameObject letter_Press;
-    void Start()
+    public Text countDownText;
+
+    public void StartSpawn()
     {
         StartCoroutine(SpawnRandomPrefabwithCoroutine());
     }
 
     IEnumerator SpawnRandomPrefabwithCoroutine()
     {
-        //add a 3 second delay before first spawning objects
-        yield return new WaitForSeconds(3f);
-
+        if(GameManager.currentLevel==1)
+            yield return new WaitForSeconds(2f);
+        
+            //add a 3 second delay before first spawning objects
+            countDownText.text = "3...";
+            yield return new WaitForSeconds(1f);
+            countDownText.text = "2...";
+            yield return new WaitForSeconds(1f);
+            countDownText.text = "1...";
+            yield return new WaitForSeconds(1f);
+            countDownText.text = "GO!";
+            yield return new WaitForSeconds(1f);
+            countDownText.text = " ";
+        
         while (TypingMiniGameManager.gameOver==false)
         {
-            //wait before starting
-            yield return new WaitForSeconds(3.0f);
             SpawnRandomPrefab();
-            float delay = 1.5f;
+            float delay = 3f;
             yield return new WaitForSeconds(delay);
         }
 
@@ -48,13 +59,13 @@ public class LetterSpawner : MonoBehaviour
         {
             letter_Press = GameObject.Find("Typing matcher (A)");
         }
-        else if (letter.name == "Letter B")
+        else if (letter.name == "Letter D")
         {
             letter_Press = GameObject.Find("Typing matcher (D)");
         }
         else
         {
-            letter_Press = GameObject.Find("Typing matcher (B)");
+            letter_Press = GameObject.Find("Typing matcher (S)");
         }
   
         spawnPos = new Vector3(letter_Press.transform.position.x-.10f, letter_Press.transform.position.y + 20, letter_Press.transform.position.z-.5f);

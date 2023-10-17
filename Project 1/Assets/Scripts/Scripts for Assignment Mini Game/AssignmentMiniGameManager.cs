@@ -13,24 +13,25 @@ public class AssignmentMiniGameManager : MonoBehaviour
     static public float successfulHits, missedHits,average;
     public Text tutorialText1, tutorialText2, tutorialText3, ScoreText,levelCompleteText;
     static public bool gameOver, gameWon, gameLoss;
-   
+    public GameObject assignmentMiniGameGroup, mainCollegeGroup;   //Groups
+    public GameObject centralGamemanager, assignmentSpawnManager;
+    private static int levelOfDifficulty = 1;
 
     // Start is called before the first frame update
-    void Start()
+    public void StartGame()
     {
         gameOver = false;
 
         successfulHits = missedHits = 0;
-
-
         //if it is the first level
-        if(true)//)GameManager.currentLevel==1)
+        if (levelOfDifficulty == 1)
         {
+
+         
             tutorialText1.enabled = true;
             tutorialText2.enabled = false;
             tutorialText3.enabled = false;
-            maximumAssignments = 10;
-            assignmentsRemaining = maximumAssignments;
+
         }
         else
         {
@@ -39,24 +40,34 @@ public class AssignmentMiniGameManager : MonoBehaviour
             tutorialText3.enabled = false;
         }
 
+        //Increase assignments 
+        maximumAssignments = levelOfDifficulty * 5;
+
+        assignmentsRemaining = maximumAssignments;
+
+        assignmentSpawnManager.GetComponent<SpawnManager>().StartSpawn();
+
+       
+
         //level complete text is not enabled
         levelCompleteText.enabled = false;
     }
+
 
     // Update is called once per frame
     void Update()
     {
         ScoreText.text = "Successful Assignments: " + successfulHits + "\nFailed Assignments: " + missedHits+ "\nRemaining Assignments: "+ assignmentsRemaining;
 
-        if(true)
+        if(levelOfDifficulty == 1)
         {
-            if (successfulHits == 5 || missedHits == 5)
+            if (successfulHits == 4 || missedHits == 4)
             {
                 tutorialText1.enabled = false;
                 tutorialText2.enabled = false;
                 tutorialText3.enabled = true;
             }
-            if (successfulHits == 3 || missedHits == 3)
+            if (successfulHits == 2 || missedHits == 2)
             {
                 tutorialText1.enabled = false;
                 tutorialText2.enabled = true;
@@ -67,7 +78,29 @@ public class AssignmentMiniGameManager : MonoBehaviour
 
         if (assignmentsRemaining == 0)
         {
-            gameOver = true;
+            FinishGame();
+
+            if (!Input.GetKeyDown(KeyCode.Space))
+            {
+                levelCompleteText.text += "\nSuccessful assignments: " + successfulHits + "\nFailed assignments: " +
+                     missedHits + "\nAccuracy: " + average + " %" + "\nPress space to continue";
+            }
+            else
+            {
+                assignmentMiniGameGroup.SetActive(false);
+                centralGamemanager.GetComponent<GameManager>().moves--;
+                if(gameWon)
+                    levelOfDifficulty += 1;
+
+                mainCollegeGroup.SetActive(true);
+            }
+
+        }
+    }
+
+    void FinishGame()
+    {
+        gameOver = true;
             if (successfulHits > missedHits)
             {
                 gameWon = true;
@@ -81,29 +114,26 @@ public class AssignmentMiniGameManager : MonoBehaviour
 
             if (GameManager.currentLevel==1)
             {
-                tutorialText2.enabled = false;
                 tutorialText1.enabled = false;
+                tutorialText2.enabled = false;
                 tutorialText3.enabled = false;
                
             }
 
-            DisplayScore();
-        }
-    }
-
-    void DisplayScore()
-    {
-        average = (successfulHits/maximumAssignments) * 100;
+        average = (successfulHits/maximumAssignments)*100;
+        centralGamemanager.GetComponent<GameManager>().academicScore += (int)average;
         if (gameWon)
         {
             levelCompleteText.text = "Level Complete!";
+          
         }
         else
         {
             levelCompleteText.text = "Level Failed!";
         }
-        levelCompleteText.text += "\nSuccessful strokes: " + successfulHits + "\nFailed Strokes: " +
-               missedHits + "\nAccuracy: " + average + " %";
+
+
+
     }
 
 }

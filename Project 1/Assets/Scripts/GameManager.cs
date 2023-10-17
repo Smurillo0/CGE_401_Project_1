@@ -9,10 +9,14 @@ public class GameManager : MonoBehaviour
 {
 
     public GameObject TypingGameGroup;
+    public GameObject AssignmentGameGroup;
     public GameObject CollegeSceneGroup;
+    public TypingMiniGameManager typingManager;
+    public AssignmentMiniGameManager assignmentManager;
 
-    public int score;
+
     public static int currentLevel;
+    public int academicScore, socialScore;
     public int moves;
     public int maxLevel;
 
@@ -20,11 +24,15 @@ public class GameManager : MonoBehaviour
     public bool won;
 
     public Text scoreText;
+    public Text scoreText2;
+    public Text levelText;
     public GameObject[] NPCS;
 
     public GameObject tutorialElements;
     public GameObject Player;
     public Slider timerBar;
+    public Slider academicBar;
+    public Slider socialBar;
     private DialogueTrigger CutsceneManager;
     public DialogueManager dialogueManager;
     private bool scenetriggered;
@@ -34,11 +42,11 @@ public class GameManager : MonoBehaviour
 
     
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         gameOver = false;
         won = false;
-        score = 0;
+        socialScore =academicScore = 0;
         currentLevel = 1;
         moves = 4;
         CutsceneManager = gameObject.GetComponent<DialogueTrigger>();
@@ -49,7 +57,13 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (cutscene) {
+        socialBar.value = socialScore;
+        academicBar.value = academicScore;
+        scoreText2.text = "Academic Score: " + academicScore;
+
+        levelText.text = "Level: " + currentLevel;
+
+/*        if (cutscene) {
             tutorialElements.SetActive(false);
             Player.SetActive(false);
 
@@ -64,11 +78,11 @@ public class GameManager : MonoBehaviour
                 Player.SetActive(true);
                 cutscene = false;
             }
-        }
+        }*/
 
         timerBar.value = moves;
 
-        scoreText.text = "Score: " + score;
+        scoreText.text = "Social Score: " + socialScore;
 
         if (moves <= 0) {
             moves = 4;
@@ -78,18 +92,35 @@ public class GameManager : MonoBehaviour
                 scenetriggered = false;
             }
 
+            if (currentLevel > maxLevel) {
+                gameOver = true;
 
-            foreach (var NPC in NPCS) {
-                NPC.GetComponent<BoxCollider2D>().enabled = true;
+                if (academicScore > 10000 && socialScore > 15) { 
+                    scoreText.text = "You Win!\nPress R to restart";
+                }
+                else
+                {
+                    scoreText.text = "You Lost!\nPress R to restart";
+                }
+                if(Input.GetKeyDown(KeyCode.R)) {
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+                }
+
+
+                foreach (var NPC in NPCS)
+                {
+                    NPC.GetComponent<BoxCollider2D>().enabled = true;
+                }
             }
 
             /*gameOver = true;
             if (score >= 5) //Commented out until we finish leveling system
             { // win condition
-                scoreText.text = "You Win!\nPress R to restart";
+                
             }
             else {
-                scoreText.text = "You Lost!\nPress R to restart";
+                
             }
             if (Input.GetKeyDown(KeyCode.R)) {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
